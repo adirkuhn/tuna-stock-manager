@@ -1,2 +1,2 @@
-# tuna-stock-manager
+# Tuna Stock Manager
 Woocommerce Stock Management
