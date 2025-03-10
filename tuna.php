@@ -13,6 +13,8 @@ use Tuna\TunaStockManager\Core\Activation;
 use Tuna\TunaStockManager\Core\AdminMenu;
 use Tuna\TunaStockManager\Core\EndpointLoader;
 use Tuna\TunaStockManager\Core\EnqueueScript;
+use Tuna\TunaStockManager\Domain\StockManager\Repository\ProductBatchRepository;
+use Tuna\TunaStockManager\Domain\StockManager\Service\StockManagerBatch;
 
 if (!defined('ABSPATH')) {
     exit; // Prevent direct access
@@ -39,3 +41,6 @@ add_action('admin_enqueue_scripts', static function() use ($container) {
 add_action('init', static function() use ($container) {
     $container->get(EndpointLoader::class)->registerEndpoints();
 });
+
+$stockManagerBatch = $container->get(StockManagerBatch::class);
+add_filter('woocommerce_get_stock_quantity', [$stockManagerBatch, 'getQuantityNotExpiredProduct'], 10, 2);

@@ -6,6 +6,7 @@ namespace Tuna\TunaStockManager\Domain\StockManager\Service;
 
 use Tuna\TunaStockManager\Domain\StockManager\Repository\ProductBatchRepository;
 use Tuna\TunaStockManager\Domain\StockManager\Request\AjaxRequest;
+use WC_Product_Simple;
 use WP_Error;
 
 class StockManagerBatch
@@ -47,5 +48,10 @@ class StockManagerBatch
     public function getProductBatches(int $productId): array
     {
         return $this->productBatchRepository->getProductBatches($productId);
+    }
+
+    public function getQuantityNotExpiredProduct(int $wcStock, WC_Product_Simple $product): int
+    {
+        return $wcStock + $this->productBatchRepository->getQuantityNotExpiredProduct($product->get_id());
     }
 }

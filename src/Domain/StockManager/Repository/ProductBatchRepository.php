@@ -7,8 +7,9 @@ use wpdb;
 class ProductBatchRepository
 {
     private const TABLE_NAME = 'tuna_product_batch';
+    private const REMOVE_PRODUCT_CLOSE_TO_EXPIRATION_DAYS = 15;
     private string $tableName;
-    public function __construct(private wpdb $wpdb)
+    public function __construct(private wpdb $wpdb, private int $removeProductCloseToExpirationDays = self::REMOVE_PRODUCT_CLOSE_TO_EXPIRATION_DAYS)
     {
         $this->tableName = $this->wpdb->prefix . self::TABLE_NAME;
     }
@@ -69,5 +70,15 @@ class ProductBatchRepository
             "SELECT id, batch_name as batchName, expiry_date as expiryDate, quantity FROM $this->tableName WHERE product_id = %d",
             $productId
         ), ARRAY_A);
+    }
+
+    public function getQuantityNotExpiredProduct(int $productId): int
+    {
+        $expiryDate = date('Y-m-d', strtotime("+{$this->removeProductCloseToExpirationDays} days"));
+        return (int) $this->wpdb->get_var($this->wpdb->prepare(
+            "SELECT SUM(quantity) FROM $this->tableName WHERE product_id = %d AND expiry_date >= %s",
+            $productId,
+            $expiryDate
+        ));
     }
 }
